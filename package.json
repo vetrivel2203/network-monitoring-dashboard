@@ -1,0 +1,31 @@
+{
+  "name": "network-packet-loss-latency-monitoring-dashboard",
+  "version": "1.0.0",
+  "description": "Comprehensive Network Telemetry and FLAT Interactive Dashboard for 3rd Year B.Tech IT",
+  "private": true,
+  "scripts": {
+    "install:server": "cd server && npm install",
+    "install:client": "cd client && npm install",
+    "install:all": "npm run install:server && npm run install:client",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "npx concurrently \"npm run dev:server\" \"npm run dev:client\" --names \"SERVER,CLIENT\" --prefix-colors \"cyan,blue\"",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "keywords": [
+    "network-monitoring",
+    "packet-loss",
+    "latency",
+    "jitter",
+    "flat",
+    "automata",
+    "dfa",
+    "nfa",
+    "cfg",
+    "pda",
+    "turing-machine"
+  ],
+  "author": "Vetrivel P R",
+  "license": "MIT"
+}

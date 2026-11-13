@@ -1,0 +1,32 @@
+{
+    "name":  "network-monitoring-server",
+    "version":  "1.0.0",
+    "description":  "Backend API \u0026 Telemetry Engine for Network Packet Loss and Latency Monitoring Dashboard",
+    "main":  "src/server.js",
+    "scripts":  {
+                    "start":  "node src/server.js",
+                    "dev":  "nodemon src/server.js",
+                    "test":  "node tests/api.test.js"
+                },
+    "dependencies":  {
+                         "cors":  "^2.8.5",
+                         "dotenv":  "^16.4.5",
+                         "express":  "^4.19.2",
+                         "express-rate-limit":  "^7.3.0",
+                         "helmet":  "^7.1.0",
+                         "mongoose":  "^8.4.0",
+                         "morgan":  "^1.10.0"
+                     },
+    "devDependencies":  {
+                            "nodemon":  "^3.1.2"
+                        },
+    "keywords":  [
+                     "network-telemetry",
+                     "express",
+                     "mongoose",
+                     "icmp",
+                     "ping"
+                 ],
+    "author":  "Vetrivel P R",
+    "license":  "MIT"
+}
