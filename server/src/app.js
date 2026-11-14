@@ -10,18 +10,25 @@ const flatRoutes = require('./routes/flatRoutes');
 
 const app = express();
 
-// Security and standard middlewares
+// Security and standard middlewares: Dynamic CORS reflector (supports localhost, Vercel, Render)
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow any origin (mobile, curl, browser requests from any port or domain)
+    callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Controlled rate limiter: 200 requests per 15 minutes per IP
+// Controlled rate limiter: 300 requests per 15 minutes per IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 300,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -38,15 +45,17 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/flat', flatRoutes);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
+// Health check endpoint (accessible at both /api/health and /health)
+const healthHandler = (req, res) => {
   res.status(200).json({
     status: 'online',
     timestamp: new Date().toISOString(),
     service: 'Network Monitoring & FLAT Telemetry API',
     version: '1.0.0'
   });
-});
+};
+app.get('/api/health', healthHandler);
+app.get('/health', healthHandler);
 
 // 404 handler for undefined API routes
 app.use((req, res, next) => {

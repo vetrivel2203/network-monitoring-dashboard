@@ -25,7 +25,7 @@ export default function Settings() {
   useEffect(() => {
     async function checkHealth() {
       try {
-        const res = await fetch('/api/health').then(r => r.json());
+        const res = await api.health();
         setServerHealth(res);
       } catch (err) {
         setServerHealth({ status: 'offline', error: err.message });
@@ -74,6 +74,11 @@ export default function Settings() {
                 {serverHealth?.service || 'Node.js Express Backend'}
               </span>
             </div>
+            {serverHealth?.status !== 'online' && (
+              <div style={{ fontSize: '0.75rem', color: '#f59e0b', marginTop: '0.5rem' }}>
+                {serverHealth?.error || 'Backend not responding. Verify server is running on port 5000 or on Render.'}
+              </div>
+            )}
           </div>
 
           <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>

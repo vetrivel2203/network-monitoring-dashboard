@@ -2,10 +2,21 @@
  * REST API Client for NetPulse Telemetry Dashboard
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Normalize API Base URL (handles missing /api, trailing slashes, or relative path)
+let rawBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+rawBaseUrl = rawBaseUrl.trim().replace(/\/+$/, ''); // Remove trailing slashes
+
+// If rawBaseUrl doesn't end with /api and doesn't start with /api, ensure /api suffix
+if (!rawBaseUrl.endsWith('/api') && rawBaseUrl.startsWith('http')) {
+  rawBaseUrl = `${rawBaseUrl}/api`;
+}
+
+const API_BASE_URL = rawBaseUrl;
 
 async function request(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${API_BASE_URL}${cleanEndpoint}`;
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -30,11 +41,17 @@ async function request(endpoint, options = {}) {
     return data;
   } catch (err) {
     console.error(`API Error on [${options.method || 'GET'} ${url}]:`, err.message);
+    if (err.name === 'TypeError' && err.message.includes('fetch')) {
+      throw new Error(`Cannot connect to backend server at ${API_BASE_URL}. If your backend is hosted on Render (Free Tier), it may be waking up from sleep (takes ~45-60 seconds). Please check your connection or wait a moment.`);
+    }
     throw err;
   }
 }
 
 export const api = {
+  // System Health
+  health: () => request('/health'),
+
   // Telemetry & Ping Probes
   ping: {
     probe: (target, count = 4, timeoutMs = 3000, isDemo = false) =>
