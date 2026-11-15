@@ -13,7 +13,6 @@ const app = express();
 // Security and standard middlewares: Dynamic CORS reflector (supports localhost, Vercel, Render)
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow any origin (mobile, curl, browser requests from any port or domain)
     callback(null, true);
   },
   credentials: true,
@@ -38,12 +37,24 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Mount API routes
-app.use('/api/ping', pingRoutes);
-app.use('/api/history', historyRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/alerts', alertRoutes);
-app.use('/api/flat', flatRoutes);
+// Welcome root route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    service: 'NetPulse Telemetry & FLAT Monitoring API',
+    version: '1.0.0',
+    documentation: 'https://github.com/vetrivel2203/network-monitoring-dashboard#api-documentation',
+    endpoints: {
+      health: '/api/health',
+      overview: '/api/ping/overview',
+      probe: 'POST /api/ping/probe',
+      analytics: '/api/analytics',
+      history: '/api/history',
+      alerts: '/api/alerts/active',
+      flat: '/api/flat/(dfa|nfa|regex|cfg|pda|turing)'
+    }
+  });
+});
 
 // Health check endpoint (accessible at both /api/health and /health)
 const healthHandler = (req, res) => {
@@ -56,6 +67,13 @@ const healthHandler = (req, res) => {
 };
 app.get('/api/health', healthHandler);
 app.get('/health', healthHandler);
+
+// Mount API routes
+app.use('/api/ping', pingRoutes);
+app.use('/api/history', historyRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/alerts', alertRoutes);
+app.use('/api/flat', flatRoutes);
 
 // 404 handler for undefined API routes
 app.use((req, res, next) => {
